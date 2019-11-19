@@ -27,5 +27,4 @@ def delete_proxy(proxy):
 
 
 if __name__ == '__main__':
-
     get_proxy()
