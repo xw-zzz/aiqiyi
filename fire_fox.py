@@ -49,6 +49,7 @@ def get_chrome(proxy):
     # print()
     #print(show_window)
     #print(type(show_window))
+
     if show_window == 0:
         options = Options()
         options.headless = True
@@ -76,31 +77,56 @@ def open_html(browser, url):
 
 def loop(urls):
     couont = 3
-    try:
-        return_json = proxy_operation.get_proxy()
-        proxy = return_json["proxy"]
-        print("向往-》代理IP%s" % proxy)
-        browser = get_chrome(proxy)
-        proxy_operation.delete_proxy(proxy)
-        # thread.start_new_thread()
-        open_html(browser, urls[0])
-        for i in urls:
-            if urls.index(i) > 0:
-                js = 'window.open("%s");' % i
-                browser.execute_script(js)
-                time.sleep(1)
-        # for i in urls:
-        #     print(i)
-        #     open_html(browser,i)
-        #     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'T')
-        time.sleep(int(sleep_time_second))
-    except Exception as e:
-        print("线程异常。%s", e)
-    finally:
-        # browser.close()
-        browser.quit()
-
-
+    # try:
+    #     return_json = proxy_operation.get_proxy()
+    #     proxy = return_json["proxy"]
+    #     print("向往-》代理IP%s" % proxy)
+    #     browser = get_chrome(proxy)
+    #     proxy_operation.delete_proxy(proxy)
+    #     # thread.start_new_thread()
+    #     open_html(browser, urls[0])
+    #     for i in urls:
+    #         if urls.index(i) > 0:
+    #             js = 'window.open("%s");' % i
+    #             browser.execute_script(js)
+    #             time.sleep(1)
+    #     # for i in urls:
+    #     #     print(i)
+    #     #     open_html(browser,i)
+    #     #     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'T')
+    #     time.sleep(int(sleep_time_second))
+    # except Exception as e:
+    #     print("线程异常。%s", e)
+    # finally:
+    #     # browser.close()
+    #     if browser is not None:
+    #         browser.quit()
+    return_json = ''
+    while(1):
+        try:
+            return_json = proxy_operation.get_proxy()
+        except Exception as e:
+            print("获取代理IP失败，重试")
+        print(return_json)
+        if return_json is not None and len(return_json) >0:
+            break
+    proxy = return_json["proxy"]
+    print("向往-》代理IP%s" % proxy)
+    browser = get_chrome(proxy)
+    proxy_operation.delete_proxy(proxy)
+    # thread.start_new_thread()
+    open_html(browser, urls[0])
+    for i in urls:
+        if urls.index(i) > 0:
+            js = 'window.open("%s");' % i
+            browser.execute_script(js)
+            time.sleep(1)
+    # for i in urls:
+    #     print(i)
+    #     open_html(browser,i)
+    #     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'T')
+    time.sleep(int(sleep_time_second))
+    browser.quit()
 if __name__ == '__main__':
     init()
     url_list = file.get_request_url()
