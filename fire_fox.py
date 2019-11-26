@@ -16,7 +16,9 @@ import os
 sleep_time_second = 0
 window_number = 0
 show_window = 1
+click_ad_interval = 20
 
+click_ad_count = 10
 
 def init():
     cf = configparser.ConfigParser()
@@ -25,10 +27,13 @@ def init():
     global sleep_time_second
     global window_number
     global show_window
+    global click_ad_interval
+    global click_ad_count
     sleep_time_second = int(cf.get('config', 'sleep_time_second'))
     window_number = int(cf.get('config', 'window_number'))
     show_window = int(cf.get('config', 'show_window'))
-
+    click_ad_interval = int(cf.get('config', 'click_ad_interval'))
+    click_ad_count = int(cf.get('config', 'click_ad_count'))
 
 def get_chrome(proxy):
     # proxy ="18.136.202.207:1024"
@@ -38,24 +43,31 @@ def get_chrome(proxy):
     # chrome_options.add_argument(argument)
     # return webdriver.Chrome(options=chrome_options)
 
-    a = proxy.split(":", 1)
-    profile = FirefoxProfile()
-    profile.set_preference('network.proxy.type', 1)
-    profile.set_preference('network.proxy.http', a[0])
-    profile.set_preference('network.proxy.http_port', a[1])
-    profile.set_preference('network.proxy.ssl', a[0])
-    profile.set_preference('network.proxy.ssl_port', a[0])
-    profile.set_preference('browser.link.open_newwindow', 3)
+    # a = proxy.split(":", 1)
+    # profile = FirefoxProfile()
+    # profile.set_preference('network.proxy.type', 1)
+    # profile.set_preference('network.proxy.http', a[0])
+    # profile.set_preference('network.proxy.http_port', a[1])
+    # profile.set_preference('network.proxy.ssl', a[0])
+    # profile.set_preference('network.proxy.ssl_port', a[0])
+
     # print()
     #print(show_window)
     #print(type(show_window))
 
+    # if show_window == 0:
+    #     options = Options()
+    #     options.headless = True
+    #     return webdriver.Firefox(profile, executable_path=os.getcwd() + "\geckodriver", options=options)
+    # else:
+    #     return webdriver.Firefox(profile, executable_path=os.getcwd() + "\geckodriver")
+
     if show_window == 0:
         options = Options()
         options.headless = True
-        return webdriver.Firefox(profile, executable_path=os.getcwd() + "\geckodriver", options=options)
+        return webdriver.Firefox(executable_path=os.getcwd() + "\geckodriver", options=options)
     else:
-        return webdriver.Firefox(profile, executable_path=os.getcwd() + "\geckodriver")
+        return webdriver.Firefox(executable_path=os.getcwd() + "\geckodriver")
 
 
 def judge(content):
@@ -74,59 +86,35 @@ def open_html(browser, url):
     if content is not None:
         judge(content)
 
-
-def loop(urls):
-    couont = 3
-    # try:
+# try:
     #     return_json = proxy_operation.get_proxy()
-    #     proxy = return_json["proxy"]
-    #     print("向往-》代理IP%s" % proxy)
-    #     browser = get_chrome(proxy)
-    #     proxy_operation.delete_proxy(proxy)
-    #     # thread.start_new_thread()
-    #     open_html(browser, urls[0])
-    #     for i in urls:
-    #         if urls.index(i) > 0:
-    #             js = 'window.open("%s");' % i
-    #             browser.execute_script(js)
-    #             time.sleep(1)
-    #     # for i in urls:
-    #     #     print(i)
-    #     #     open_html(browser,i)
-    #     #     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'T')
-    #     time.sleep(int(sleep_time_second))
     # except Exception as e:
-    #     print("线程异常。%s", e)
-    # finally:
-    #     # browser.close()
-    #     if browser is not None:
-    #         browser.quit()
-    return_json = ''
+    #     print("获取代理IP失败，重试")
+    # print(return_json)
+    # if return_json is not None and len(return_json) >0:
+    #     break
+    # proxy = return_json["proxy"]
+    # print("向往-》代理IP%s" % proxy)
+def loop(urls):
     while(1):
-        try:
-            return_json = proxy_operation.get_proxy()
-        except Exception as e:
-            print("获取代理IP失败，重试")
-        print(return_json)
-        if return_json is not None and len(return_json) >0:
-            break
-    proxy = return_json["proxy"]
-    print("向往-》代理IP%s" % proxy)
-    browser = get_chrome(proxy)
-    proxy_operation.delete_proxy(proxy)
-    # thread.start_new_thread()
-    open_html(browser, urls[0])
-    for i in urls:
-        if urls.index(i) > 0:
-            js = 'window.open("%s");' % i
-            browser.execute_script(js)
-            time.sleep(1)
-    # for i in urls:
-    #     print(i)
-    #     open_html(browser,i)
-    #     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'T')
-    time.sleep(int(sleep_time_second))
-    browser.quit()
+        proxy =''
+        browser = get_chrome(proxy)
+        # browser.get("http://httpbin.org/ip")
+        # print(browser.page_source)
+        #proxy_operation.delete_proxy(proxy)
+        # thread.start_new_thread()
+        open_html(browser, urls[0])
+        # for i in range(0,click_ad_count):
+        #     browser.find_element_by_id("flashbox").click()
+        #     time.sleep(click_ad_interval)
+
+        for i in urls:
+            if urls.index(i) > 0:
+                js = 'window.open("%s");' % i
+                browser.execute_script(js)
+        time.sleep(int(sleep_time_second))
+        browser.quit()
+
 if __name__ == '__main__':
     init()
     url_list = file.get_request_url()
@@ -149,7 +137,7 @@ if __name__ == '__main__':
     print("向往-》请求路径%s" % url_list)
     print("向往-》任务执行")
     count = 0
-    while (1):
+    while 1:
         count = count + 1
         print("向往-》执行%s次" % count)
         loop(url_list)
