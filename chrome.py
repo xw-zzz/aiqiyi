@@ -3,6 +3,8 @@
 # Description:  
 # Author:       10264
 # Date:         2019/11/18
+from json import load
+
 from selenium import webdriver
 import time
 import proxy_operation
@@ -106,6 +108,29 @@ def loop(urls):
 
     time.sleep(int(sleep_time_second))
     browser.quit()
+
+def getIP():
+    from urllib.request import urlopen
+    my_ip = load(urlopen('http://httpbin.org/ip'))['origin']
+    print("当前IP %s" % my_ip)
+
+
+def bohao():
+    while True:
+        os.system('@Rasdial 宽带连接 /DISCONNECT')  # 先断开宽带连接（这个宽带连接是你的网络名字，可以叫做别的）
+        # 然后重新拨号
+        os.system('@Rasdial 宽带连接 051685874292 1MPRYA70')
+        res = os.system('ping 8.8.8.8')
+        # 没有网络的时候res为True
+        if res:
+            print("准备重新连接")
+            time.sleep(2)
+        # 有网络 什么都不做
+        else:
+            break
+        # 每隔 5分钟进行一次检测
+    getIP()
+
 
 if __name__ == '__main__':
     init()
